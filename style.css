@@ -900,3 +900,27 @@ h1, h2, h3, .serif {
     .feature-title { font-size: 1.5rem; }
 }
 
+/* ==========================================================================
+   LOW-END MOBILE OPTIMIZATIONS (Performance Fallbacks)
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Disable expensive backdrop-filters to save GPU/Battery */
+    * {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Enhance visibility for elements that relied on the blur */
+    .top-bar, .hero-search-container, .feature-overlay, .sticky-nav, .product-nav, .sidebar-menu {
+        background: rgba(15, 15, 15, 0.98) !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.5) !important;
+    }
+    
+    .social-btn, .color-selector button, .thumb-img {
+        background: rgba(30, 30, 30, 0.9) !important;
+    }
+
+    .btn-buy, .btn-glass, .product-grid-card, .specs-container, .image-gallery {
+        background: rgba(20, 20, 20, 0.98) !important;
+    }
+}
