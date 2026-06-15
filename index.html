@@ -280,14 +280,14 @@
     <script>
         // Initialize Lenis Smooth Scroll
         const lenis = new Lenis({
-            duration: 1.2,
+            duration: 1.5,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
             direction: 'vertical',
             gestureDirection: 'vertical',
             smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false, // keep native touch scrolling for true mobile feel, but Lenis intercepts
-            touchMultiplier: 2,
+            mouseMultiplier: 0.8,
+            smoothTouch: true, // Enable smooth touch for a buttery mobile experience
+            touchMultiplier: 1.5,
             infinite: false,
         })
 
@@ -408,12 +408,43 @@
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // Preload images
-        for (let i = 0; i < frameCount; i++) {
-            const img = new Image();
-            img.src = currentFrame(i);
-            images.push(img);
-        }
+        // Preload images - Deferred to prevent blocking page load
+        const images = new Array(frameCount);
+        
+        // 1. Load the first frame immediately so the canvas isn't empty
+        const firstImg = new Image();
+        firstImg.src = currentFrame(0);
+        images[0] = firstImg;
+
+        // 2. Defer the rest of the 240 frames
+        window.addEventListener('load', () => {
+            let index = 1;
+            
+            function loadNextBatch() {
+                // Load in small chunks (e.g. 5 at a time) to avoid clogging the network
+                for (let i = 0; i < 5 && index < frameCount; i++) {
+                    const img = new Image();
+                    img.src = currentFrame(index);
+                    images[index] = img;
+                    
+                    const currentIndex = index;
+                    img.onload = () => {
+                        // If the user scrolled to this frame before it loaded, render it now
+                        if (Math.round(canvasObj.frame) === currentIndex) {
+                            render();
+                        }
+                    };
+                    index++;
+                }
+                
+                if (index < frameCount) {
+                    setTimeout(loadNextBatch, 50); // Yield to main thread to keep scroll smooth
+                }
+            }
+            
+            // Start the background loading shortly after page load
+            setTimeout(loadNextBatch, 200);
+        });
 
         // Draw image to canvas covering it properly
         function render() {
