@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Product Details - Neo brights</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .product-details-container {
+            flex: 1;
+            max-width: 800px;
+            margin: 8rem auto 4rem auto;
+            padding: 0 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            align-items: stretch;
+        }
+
+        .visual-gallery-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .details-visual {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .details-img {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .details-img.slide-out-left { opacity: 0; transform: translateX(-30px); }
+        .details-img.slide-out-right { opacity: 0; transform: translateX(30px); }
+        .details-img.slide-in-right { opacity: 0; transform: translateX(30px); }
+        .details-img.slide-in-left { opacity: 0; transform: translateX(-30px); }
+
+        .img-wrapper {
+            position: relative;
+            max-width: 500px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .left-arrow { left: 10px; }
+        .right-arrow { right: 10px; }
+
+        .thumbnails-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 0.5rem;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        .thumbnails-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .thumb-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .thumb-img.active, .thumb-img:hover {
+            border-color: #ffffaa;
+            transform: scale(1.05);
+        }
+
+        .details-info {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+        }
+
+        .details-title {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #ffffff, #aaaaaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .details-desc {
+            font-family: var(--font-sans);
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .specs-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 2rem;
+        }
+
+        .specs-list li {
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-sans);
+        }
+
+        .specs-label {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .specs-value {
+            color: var(--text-muted);
+        }
+
+        .btn-back {
+            display: inline-block;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: rgba(255,255,255,0.1);
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 768px) {
+            .product-details-container {
+                flex-direction: column;
+                margin-top: 8rem;
+                gap: 2rem;
+            }
+            .details-title {
+                font-size: 2rem;
+            }
+            .details-info {
+                padding: 1.5rem;
+            }
+        }
+        .product-video-container {
+            max-width: 800px;
+            margin: 0 auto 4rem auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .product-video {
+            width: 100%;
+            height: auto;
+            border-radius: 24px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .review-container-wrapper {
+            max-width: 800px;
+            margin: 0 auto 6rem auto;
+            padding: 0 2rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 3rem;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            box-sizing: border-box;
+        }
+
+        /* Checkout Dashboard Styles */
+        .checkout-dashboard {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-left: 0.5rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group textarea {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            resize: vertical;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(255, 115, 115, 0.5);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0,0,0,0.2);
+            padding: 0.5rem;
+            border-radius: 30px;
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .qty-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .qty-display {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: 1.2rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .location-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .btn-location {
+            background: rgba(255, 115, 115, 0.15);
+            color: #ffb3b3;
+            border: 1px solid rgba(255, 115, 115, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            width: fit-content;
+        }
+
+        .btn-location:hover {
+            background: rgba(255, 115, 115, 0.25);
+        }
+
+        .location-display {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: monospace;
+            word-break: break-all;
+            display: none;
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            text-decoration: none;
+            padding: 1.2rem;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.8rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+            margin-top: 1rem;
+        }
+
+        .btn-whatsapp:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4);
+        }
+
+        /* Review Section Styles */
+        .review-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .star-rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            margin: 0;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #ffc107;
+            text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+        }
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .file-upload-wrapper:hover {
+            border-color: rgba(255, 115, 115, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+        }
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .file-upload-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .btn-submit-review {
+            background: linear-gradient(135deg, #ff4d4d, #ff9999);
+            color: white;
+            padding: 1rem;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            text-transform: uppercase;
+        }
+        .btn-submit-review:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(255, 77, 77, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP BAR / FLOATING NAV -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <a href="index.html" class="social-btn" title="Back Home">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                </svg>
+            </a>
+            <a href="cart.html" class="social-btn" title="Your Cart">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                </svg>
+            </a>
+        </div>
+        
+        <div class="top-bar-center">
+            <div class="brand">Neo brights</div>
+        </div>
+
+        <div class="top-bar-right">
+            <a href="tel:+916235049267" class="social-btn" title="Call Us">
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div class="product-details-container">
+        <h1 class="details-title fade-in-section" id="product-title" style="text-align: center; margin-bottom: -2rem;">Loading...</h1>
+        <div class="visual-gallery-wrapper fade-in-section">
+            <div class="details-visual" id="visual-container">
+                <div class="img-wrapper">
+                    <button class="nav-arrow left-arrow" id="prev-btn">&#10094;</button>
+                    <img src="public5/image/1.overview_image_53293314_1076212.png" alt="Product Image" id="product-img" class="details-img">
+                    <button class="nav-arrow right-arrow" id="next-btn">&#10095;</button>
+                </div>
+            </div>
+            <div class="thumbnails-container" id="thumbnails-container">
+                <!-- Javascript will inject thumbnails here -->
+            </div>
+        </div>
+        <div class="details-info fade-in-section">
+            <p class="details-desc" id="product-desc">Please wait while we load the product details.</p>
+            
+            <!-- Color Selector -->
+            <div id="color-selector-container" style="display: none; margin-bottom: 2rem;">
+                <p style="font-family: var(--font-sans); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 0.8rem;">Select Color:</p>
+                <div id="color-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap;"></div>
+            </div>
+
+            <ul class="specs-list" id="product-specs">
+                <!-- Javascript will inject specs here -->
+            </ul>
+
+            <!-- Checkout Dashboard -->
+            <div class="checkout-dashboard">
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <div class="quantity-selector">
+                        <button class="qty-btn" id="btn-qty-minus">-</button>
+                        <span class="qty-display" id="qty-display">1</span>
+                        <button class="qty-btn" id="btn-qty-plus">+</button>
+                    </div>
+                </div>
+
+                <button class="btn-whatsapp" id="btn-add-cart" style="background: linear-gradient(135deg, #ff3366, #ff0044);">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                    Add to Cart
+                </button>
+            </div>
+            <a href="index.html" class="btn-back" style="margin-top: 1rem;">&larr; Back to Products</a>
+        </div>
+    </div>
+
+    <!-- PRODUCT VIDEO SECTION -->
+    <div class="product-video-container fade-in-section">
+        <video class="product-video" autoplay loop muted playsinline>
+            <source src="public4/mp4/YouCut_20260602_085054679.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+
+    
+    <!-- BOTTOM REVIEW SECTION -->
+    <div class="review-container-wrapper fade-in-section">
+        <div class="review-card">
+            <!-- Review Section -->
+            <div class="review-section" style="margin-top: 0; padding-top: 0; border-top: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1rem;">
+                    <h3 style="font-family: var(--font-serif); font-size: 1.8rem; color: var(--text-primary); margin: 0;">Rate & Review</h3>
+                    <div style="text-align: right;">
+                        <div style="color: #ffc107; font-size: 1.2rem; margin-bottom: 0.2rem;">
+                            &#9733;&#9733;&#9733;&#9733;&#9734; <span style="color: var(--text-primary); font-family: var(--font-sans); font-weight: bold; margin-left: 0.5rem; font-size: 1rem;">4.8</span>
+                        </div>
+                        <span style="font-family: var(--font-sans); color: var(--text-muted); font-size: 0.85rem;">Based on <strong>124</strong> Reviews</span>
+                    </div>
+                </div>
+                <form id="review-form">
+                    <div class="form-group">
+                        <label>Star Rating</label>
+                        <div class="star-rating">
+                            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">&#9733;</label>
+                            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">&#9733;</label>
+                            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">&#9733;</label>
+                            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">&#9733;</label>
+                            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">&#9733;</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Photo</label>
+                        <div class="file-upload-wrapper" id="file-upload-wrapper">
+                            <input type="file" id="product-photo" accept="image/*" class="file-input">
+                            <div class="file-upload-content">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" style="margin-bottom: 10px; opacity: 0.7;">
+                                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                                </svg>
+                                <span id="file-name">Drag & Drop or Click to Upload</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit-review">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to load product data based on URL -->
+    <script>
+                const productsData = {
+            "neon-warm-white": {
+                title: "Neon Flexible LED Strip Light, Warm White",
+                image: "public5/image/1.overview_image_53293314_1076212.png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Warm White illumination for a cozy atmosphere. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "Warm White",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "neon-blue": {
+                title: "Neon Flexible LED Strip Light, blue",
+                image: "public5/image/2.overview_image_25554802_1031898.png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Deep, vibrant blue colors to create an immersive futuristic atmosphere. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "Blue",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "neon-red": {
+                title: "Neon Flexible LED Strip Light, red",
+                image: "public5/image/3.overview_image_237846661_1123236.png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Bold red illumination for striking visual effects. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "Red",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "neon-green": {
+                title: "Neon Flexible LED Strip Light green",
+                image: "public5/image/4.overview_image_39222808_1085839.png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Bright green lights to energize your space. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "Green",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "neon-white": {
+                title: "Neon Flexible LED Strip Light white",
+                image: "public5/image/5.overview_image_261658597_1101228 (1).png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Pure, crisp white light for a clean modern look. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "White",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "neon-multi": {
+                title: "Neon Flexible LED Strip Light multi colour",
+                image: "public5/image/6.overview_image_261658597_1101228.png",
+                extraImages: [
+                    "public6/image/neon_bedroom_setup_1781018204556.png",
+                    "public6/image/neon_flex_closeup_1781014067088.png",
+
+                    "public6/image/neon_outdoor_architectural_1781014096094.png",
+                    "public6/image/neon_rolled_product_1781016062330.png",
+                    "public6/image/neon_room_lifestyle_1781014081885.png"
+                ],
+                description: "Dynamic multi-color lighting for any occasion. High-density LEDs provide a seamless, dot-free lighting experience.",
+                specs: {
+                    "Color": "Multi Colour",
+                    "Length": "5 Meters",
+                    "Voltage": "12V DC",
+                    "Durability": "Waterproof IP67"
+                },
+                price: "₹599.00"
+            },
+            "3-led-module": {
+                title: "3 LED light Module 20 pieces",
+                image: "public3/image/7.file_00000000e5947207884c234f495a294a~3.png",
+                extraImages: [
+                    "public7/image/61796.png",
+                    "public7/image/61798.png",
+                    "public7/image/61800.png",
+                    "public7/image/61802.png",
+                    "public7/image/61804.png"
+                ],
+                colors: [
+                    { name: "Blue", colorCode: "#2196F3", imageIndex: 1 },
+                    { name: "Green", colorCode: "#4CAF50", imageIndex: 2 },
+                    { name: "Warm", colorCode: "#FFC107", imageIndex: 3 },
+                    { name: "Red", colorCode: "#F44336", imageIndex: 4 },
+                    { name: "White", colorCode: "#FFFFFF", imageIndex: 5 }
+                ],
+                description: "High quality 3 LED light Module, pack of 20 pieces. Perfect for custom lighting solutions and signage.",
+                specs: {
+                    "Type": "LED Module",
+                    "Quantity": "20 Pieces",
+                    "Voltage": "12V DC",
+                    "Application": "Signage, Accent Lighting"
+                },
+                price: "₹399.00"
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            let selectedColor = ""; // Track color selection globally within DOMContentLoaded
+
+            // Get product ID from URL query parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            let productId = urlParams.get('id');
+            
+            if (!productId) {
+                productId = 'neon-warm-white';
+            }
+
+            const product = productsData[productId];
+
+            if (product) {
+                // Populate DOM
+                document.getElementById("product-title").textContent = product.title;
+                document.getElementById("product-desc").textContent = product.description;
+                
+                const mainImg = document.getElementById("product-img");
+                mainImg.src = product.image;
+                mainImg.alt = product.title;
+
+                const thumbnailsContainer = document.getElementById("thumbnails-container");
+                thumbnailsContainer.innerHTML = '';
+
+                // Create array of all images
+                const allImages = [product.image];
+                if (product.extraImages && product.extraImages.length > 0) {
+                    allImages.push(...product.extraImages);
+                }
+
+                let currentImageIndex = 0;
+
+                const changeImage = (newIndex) => {
+                    if (newIndex < 0) newIndex = allImages.length - 1;
+                    if (newIndex >= allImages.length) newIndex = 0;
+                    if (newIndex === currentImageIndex) return;
+                    
+                    let isForward = newIndex > currentImageIndex;
+                    if (currentImageIndex === allImages.length - 1 && newIndex === 0) isForward = true;
+                    if (currentImageIndex === 0 && newIndex === allImages.length - 1) isForward = false;
+                    
+                    const outClass = isForward ? 'slide-out-left' : 'slide-out-right';
+                    const inClass = isForward ? 'slide-in-right' : 'slide-in-left';
+                    
+                    currentImageIndex = newIndex;
+                    const imgSrc = allImages[currentImageIndex];
+                    
+                    mainImg.classList.add(outClass);
+                    
+                    setTimeout(() => {
+                        mainImg.src = imgSrc;
+                        mainImg.classList.remove(outClass);
+                        mainImg.classList.add(inClass);
+                        
+                        void mainImg.offsetWidth;
+                        
+                        mainImg.classList.remove(inClass);
+                    }, 300);
+
+                    // Update thumbnails
+                    const allThumbs = document.querySelectorAll('.thumb-img');
+                    allThumbs.forEach(t => t.classList.remove('active'));
+                    if(allThumbs[currentImageIndex]) {
+                        allThumbs[currentImageIndex].classList.add('active');
+                        allThumbs[currentImageIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                };
+
+                // Render Color Selectors if available
+                const colorContainer = document.getElementById("color-selector-container");
+                const colorButtons = document.getElementById("color-buttons");
+                
+                if (product.colors && product.colors.length > 0) {
+                    colorContainer.style.display = "block";
+                    colorButtons.innerHTML = '';
+                    product.colors.forEach(colorObj => {
+                        const btn = document.createElement("button");
+                        btn.title = colorObj.name;
+                        btn.style.width = "30px";
+                        btn.style.height = "30px";
+                        btn.style.borderRadius = "50%";
+                        btn.style.border = "2px solid rgba(255,255,255,0.2)";
+                        btn.style.backgroundColor = colorObj.colorCode;
+                        btn.style.cursor = "pointer";
+                        btn.style.transition = "all 0.3s ease";
+                        
+                        btn.addEventListener("mouseover", () => {
+                            if (selectedColor !== colorObj.name) {
+                                btn.style.transform = "scale(1.1)";
+                                btn.style.borderColor = "#fff";
+                            }
+                        });
+                        btn.addEventListener("mouseout", () => {
+                            if (selectedColor !== colorObj.name) {
+                                btn.style.transform = "scale(1)";
+                                btn.style.borderColor = "rgba(255,255,255,0.2)";
+                            }
+                        });
+                        
+                        btn.addEventListener("click", () => {
+                            changeImage(colorObj.imageIndex);
+                            selectedColor = colorObj.name;
+                            
+                            // Update active state visuals
+                            Array.from(colorButtons.children).forEach(b => {
+                                b.style.transform = "scale(1)";
+                                b.style.borderColor = "rgba(255,255,255,0.2)";
+                                b.style.boxShadow = "none";
+                            });
+                            btn.style.transform = "scale(1.1)";
+                            btn.style.borderColor = "#fff";
+                            btn.style.boxShadow = "0 0 10px rgba(255,255,255,0.8)";
+                        });
+                        colorButtons.appendChild(btn);
+                    });
+                } else {
+                    colorContainer.style.display = "none";
+                }
+
+                // Add thumbnails
+                allImages.forEach((imgSrc, index) => {
+                    const thumb = document.createElement('img');
+                    thumb.src = imgSrc;
+                    thumb.alt = `${product.title} - View ${index + 1}`;
+                    thumb.className = 'thumb-img' + (index === 0 ? ' active' : '');
+                    thumb.addEventListener('click', () => {
+                        changeImage(index);
+                    });
+                    thumbnailsContainer.appendChild(thumb);
+                });
+
+                // Add event listeners for arrows
+                document.getElementById('prev-btn').addEventListener('click', () => {
+                    changeImage(currentImageIndex - 1);
+                });
+                
+                document.getElementById('next-btn').addEventListener('click', () => {
+                    changeImage(currentImageIndex + 1);
+                });
+
+
+
+                // Populate Specs
+                const specsList = document.getElementById("product-specs");
+                specsList.innerHTML = ''; // Clear loading text
+                
+                for (const [key, value] of Object.entries(product.specs)) {
+                    const li = document.createElement("li");
+                    
+                    const label = document.createElement("span");
+                    label.className = "specs-label";
+                    label.textContent = key;
+                    
+                    const val = document.createElement("span");
+                    val.className = "specs-value";
+                    val.textContent = value;
+
+                    li.appendChild(label);
+                    li.appendChild(val);
+                    specsList.appendChild(li);
+                }
+            } else {
+                document.getElementById("product-title").textContent = "Product Not Found";
+                document.getElementById("product-desc").textContent = "The product you are looking for does not exist or has been removed.";
+                document.getElementById("product-specs").innerHTML = '';
+            }
+
+            // Simple Fade In animation
+            const fadeElements = document.querySelectorAll('.fade-in-section');
+            fadeElements.forEach(el => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                    el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                }, 100);
+            });
+
+            // E-Commerce Dashboard Logic
+            let currentQuantity = 1;
+            let currentLocation = "";
+
+            const qtyDisplay = document.getElementById("qty-display");
+            const btnMinus = document.getElementById("btn-qty-minus");
+            const btnPlus = document.getElementById("btn-qty-plus");
+
+            btnMinus.addEventListener("click", () => {
+                if (currentQuantity > 1) {
+                    currentQuantity--;
+                    qtyDisplay.textContent = currentQuantity;
+                }
+            });
+
+            btnPlus.addEventListener("click", () => {
+                currentQuantity++;
+                qtyDisplay.textContent = currentQuantity;
+            });
+
+            const btnAddCart = document.getElementById("btn-add-cart");
+            if(btnAddCart) {
+                btnAddCart.addEventListener("click", () => {
+                    let cart = JSON.parse(localStorage.getItem("neo_cart")) || [];
+                    
+                    let finalTitle = product.title;
+                    if (selectedColor) {
+                        finalTitle += ` - ${selectedColor}`;
+                    }
+
+                    // Use the currently displayed image from the DOM
+                    const imgElement = document.getElementById("product-img");
+                    let finalImage = imgElement ? imgElement.src : product.image;
+                    // If the src is an absolute localhost URL, convert it to a relative path to match existing cart data
+                    if (finalImage.includes(window.location.host)) {
+                        finalImage = finalImage.substring(finalImage.indexOf(window.location.host) + window.location.host.length);
+                        if (finalImage.startsWith('/')) finalImage = finalImage.substring(1);
+                    }
+
+                    cart.push({
+                        id: productId,
+                        title: finalTitle,
+                        image: finalImage,
+                        quantity: currentQuantity
+                    });
+                    localStorage.setItem("neo_cart", JSON.stringify(cart));
+                    
+                    // Visual feedback
+                    const originalText = btnAddCart.innerHTML;
+                    btnAddCart.innerHTML = "Added to Cart ✓";
+                    btnAddCart.style.background = "#25D366";
+                    
+                    setTimeout(() => {
+                        window.location.href = "cart.html";
+                    }, 800);
+                });
+            }
+
+            // Review Form Logic
+            const fileInput = document.getElementById('product-photo');
+            const fileNameDisplay = document.getElementById('file-name');
+            const fileWrapper = document.getElementById('file-upload-wrapper');
+
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                    fileWrapper.style.borderColor = "var(--border-color)";
+                    fileWrapper.style.background = "rgba(255, 115, 115, 0.1)";
+                } else {
+                    fileNameDisplay.textContent = "Drag & Drop or Click to Upload";
+                    fileWrapper.style.borderColor = "rgba(255, 255, 255, 0.2)";
+                    fileWrapper.style.background = "rgba(255, 255, 255, 0.02)";
+                }
+            });
+
+            const reviewForm = document.getElementById('review-form');
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = reviewForm.querySelector('.btn-submit-review');
+                const originalText = btn.textContent;
+                btn.textContent = "Submitting...";
+                btn.style.opacity = 0.7;
+                
+                setTimeout(() => {
+                    alert("Thank you for your rating & review!");
+                    reviewForm.reset();
+                    fileNameDisplay.textContent = "Drag & Drop or Click to Upload";
+                    btn.textContent = originalText;
+                    btn.style.opacity = 1;
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
