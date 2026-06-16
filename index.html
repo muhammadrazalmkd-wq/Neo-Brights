@@ -227,6 +227,36 @@
                     <p class="note-text">4. Trust in our cutting-edge technology to bring your creative lighting ideas to life.</p>
                 </div>
             </section>
+
+            <!-- Our Services Section -->
+            <section class="services-section fade-in-section" id="services">
+                <div class="static-title-container" style="padding: 2rem 0; margin-bottom: 2rem;">
+                    <h2 class="static-title">Our Services</h2>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <div class="service-icon">🌟</div>
+                        <h3 class="service-title">Premium Lighting Solutions</h3>
+                        <p class="service-desc">High-quality LEDs for homes, commercial spaces, and custom architectural projects.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">🛠️</div>
+                        <h3 class="service-title">Custom Installations</h3>
+                        <p class="service-desc">Tailored setups and precise fittings to bring your creative lighting ideas to life.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">⚡</div>
+                        <h3 class="service-title">Repair & Maintenance</h3>
+                        <p class="service-desc">Fast, reliable, and professional support to keep your lighting setups shining bright.</p>
+                    </div>
+                    <div class="service-card">
+                        <div class="service-icon">📦</div>
+                        <h3 class="service-title">Wholesale & Retail</h3>
+                        <p class="service-desc">Providing bulk orders and individual sales at the most competitive market prices.</p>
+                    </div>
+                </div>
+            </section>
+
             <!-- Location Section -->
             <section class="location-section fade-in-section" id="location">
                 <h2 class="location-title">Our store📍</h2>
@@ -408,18 +438,16 @@
         }
         window.addEventListener('resize', resizeCanvas);
 
-        // Preload images
+        // Pre-fill images array
         for (let i = 0; i < frameCount; i++) {
-            const img = new Image();
-            img.src = currentFrame(i);
-            images.push(img);
+            images.push(new Image());
         }
 
         // Draw image to canvas covering it properly
         function render() {
             if(!images[canvasObj.frame]) return;
             const img = images[canvasObj.frame];
-            if(!img.complete) return;
+            if(!img.complete || img.naturalWidth === 0) return;
             
             const hRatio = canvas.width / img.width;
             const vRatio = canvas.height / img.height;
@@ -432,12 +460,34 @@
                               centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
         }
 
-        // Wait for first image to load to render
+        // Load first image immediately to initialize canvas
+        images[0].src = currentFrame(0);
         images[0].onload = () => {
             resizeCanvas();
             // Initial title entrance
             gsap.fromTo("#canvas-hero-title", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" });
+            // Start sequential batch loading for the rest to prevent mobile connection limit crashes
+            preloadImagesSequentially(1, 4); 
         };
+        images[0].onerror = () => {
+            preloadImagesSequentially(1, 4);
+        };
+
+        function preloadImagesSequentially(startIndex, batchSize) {
+            if (startIndex >= frameCount) return;
+            let loadedInBatch = 0;
+            let currentBatchSize = Math.min(batchSize, frameCount - startIndex);
+            
+            for (let i = startIndex; i < startIndex + currentBatchSize; i++) {
+                images[i].src = currentFrame(i);
+                images[i].onload = images[i].onerror = () => {
+                    loadedInBatch++;
+                    if (loadedInBatch === currentBatchSize) {
+                        preloadImagesSequentially(startIndex + batchSize, batchSize);
+                    }
+                };
+            }
+        }
 
         // ScrollTrigger for Canvas Sequence
         gsap.to(canvasObj, {
