@@ -48,7 +48,7 @@ h1, h2, h3, .serif {
 
 .top-bar {
     position: fixed;
-    top: 1.5rem;
+    top: 1.2rem;
     left: 50%;
     transform: translateX(-50%);
     width: 98%;
@@ -56,7 +56,7 @@ h1, h2, h3, .serif {
     z-index: 200;
     display: flex;
     justify-content: space-between;
-    padding: 1.2rem 2rem;
+    padding: 0.9rem 1.5rem;
     pointer-events: none; /* Allows clicks to pass through empty spaces */
     
     /* Liquid Glass Box Edge Carved */
@@ -84,8 +84,8 @@ h1, h2, h3, .serif {
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2), inset 1px 0 0 rgba(255, 255, 255, 0.1);
     
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -107,7 +107,7 @@ h1, h2, h3, .serif {
 
 .brand {
     font-family: var(--font-serif);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: 0.2em;
     background: linear-gradient(90deg, #ffffff, #dddddd);
@@ -679,7 +679,7 @@ h1, h2, h3, .serif {
 
 .static-title {
     font-family: var(--font-serif);
-    font-size: 3.5rem;
+    font-size: 2.5rem;
     font-weight: 400;
     text-transform: capitalize;
     letter-spacing: 0.05em;
@@ -870,33 +870,122 @@ h1, h2, h3, .serif {
 @media (max-width: 768px) {
     /* Top Bar Scaling */
     .top-bar {
-        padding: 0.5rem 1rem;
+        padding: 0.6rem 0.8rem;
+        border-radius: 16px;
+    }
+    
+    .top-bar-left, .top-bar-right {
+        gap: 0.4rem;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+        letter-spacing: 0.1em;
+        margin: 0 0.4rem;
+        white-space: nowrap;
     }
     
     .social-btn {
-        width: 30px;
-        height: 30px;
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
     }
     
     .social-btn svg {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
     }
 
     /* Hero Section Sizing */
     .hero-title {
-        font-size: 15vw;
+        font-size: 12vw;
     }
 
     .hero-subtitle {
-        font-size: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Change phone seeing time (reduce scroll duration for animation) */
+    #hero-sequence-section {
+        height: 150vh !important;
     }
 
     /* Feature Overlays to stack better on mobile */
-    #feature-1 { top: 10%; left: 5%; max-width: 250px; }
-    #feature-2 { bottom: 10%; right: 5%; max-width: 250px; }
-    #feature-3 { bottom: 15%; left: 5%; max-width: 250px; }
+    #feature-1 { top: 10%; left: 5%; max-width: 220px; }
+    #feature-2 { bottom: 10%; right: 5%; max-width: 220px; }
+    #feature-3 { bottom: 15%; left: 5%; max-width: 220px; }
 
-    .feature-title { font-size: 1.5rem; }
+    .feature-title { font-size: 1.4rem; }
+    .feature-desc { font-size: 0.9rem; }
+    
+    /* Search Bar Scaling */
+    .hero-search-container {
+        min-width: 280px;
+        max-width: 90%;
+        margin-top: 1.5rem;
+        padding: 0.4rem;
+    }
+
+    .hero-search-input {
+        font-size: 0.95rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    /* Best Sizes for Typography and Layout */
+    .anatomy-title {
+        font-size: 2rem;
+    }
+    
+    .product-grid-text .anatomy-title {
+        font-size: 0.9rem;
+    }
+
+    .product-grid-item .btn-text {
+        font-size: 0.75rem !important;
+        padding: 0.4rem 0.8rem !important;
+        margin-top: 0.8rem !important;
+    }
+
+    .static-title-container {
+        padding: 3rem 1rem 1rem 1rem;
+    }
+
+    .static-title {
+        font-size: 1.6rem;
+    }
+    
+    .marquee-content span {
+        font-size: 2.2rem;
+    }
+
+    .note-title {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+
+    .note-text {
+        font-size: 0.95rem;
+    }
+
+    .location-title {
+        font-size: 1.6rem;
+    }
+    
+    /* Grid and Padding adjustments for 2-column mobile */
+    .product-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 2rem 0.5rem;
+        gap: 0.8rem;
+    }
+    
+    .product-grid-item {
+        padding: 0.8rem;
+        border-radius: 12px;
+    }
+
+    .product-grid-item img {
+        height: 110px;
+        margin-bottom: 0.5rem;
+    }
 }
 

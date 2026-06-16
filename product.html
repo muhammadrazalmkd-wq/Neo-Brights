@@ -23,6 +23,8 @@
 
         .product-details-container {
             flex: 1;
+            width: 100%;
+            box-sizing: border-box;
             max-width: 800px;
             margin: 8rem auto 4rem auto;
             padding: 0 2rem;
@@ -49,8 +51,8 @@
         .details-img {
             width: 100%;
             max-width: 500px;
-            aspect-ratio: 1/1;
-            object-fit: cover;
+            height: auto;
+            object-fit: contain;
             border-radius: 20px;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
@@ -66,6 +68,7 @@
             position: relative;
             max-width: 500px;
             width: 100%;
+            box-sizing: border-box;
             display: flex;
             justify-content: center;
         }
@@ -132,6 +135,10 @@
 
         .details-info {
             flex: 1;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+            word-break: break-word;
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
@@ -202,14 +209,43 @@
         @media (max-width: 768px) {
             .product-details-container {
                 flex-direction: column;
-                margin-top: 8rem;
-                gap: 2rem;
+                margin-top: 6rem;
+                gap: 1.5rem;
+                padding: 0 1rem;
             }
             .details-title {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
             .details-info {
+                padding: 1.2rem;
+            }
+            .details-desc {
+                font-size: 1rem;
+            }
+            .specs-list li {
+                flex-direction: column;
+                gap: 0.3rem;
+            }
+            .btn-whatsapp {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+            .product-video-container {
+                padding: 0 1rem;
+            }
+            .review-container-wrapper {
+                padding: 0 1rem;
+            }
+            .review-card {
                 padding: 1.5rem;
+            }
+            .nav-arrow {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            .details-img {
+                border-radius: 12px;
             }
         }
         .product-video-container {
