@@ -39,11 +39,7 @@
         </div>
 
         <div class="top-bar-right">
-            <a href="tel:+916235049267" class="social-btn" title="Call Us">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                </svg>
-            </a>
+
             <a href="mailto:neobrightspkd@gmail.com" class="social-btn" title="Email Us">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
                     <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
@@ -67,7 +63,7 @@
         <!-- CANVAS IMAGE SEQUENCE HERO SECTION -->
         <section id="hero-sequence-section" class="scroll-section" style="height: 250vh;">
             <div class="sticky-container">
-                <canvas id="hero-canvas"></canvas>
+                <video id="hero-video" src="public1/mp4/YouCut_20260616_094007093.mp4" autoplay loop muted playsinline></video>
                 
                 <div class="hero-content" id="canvas-hero-title">
                     <h1 class="hero-title">Next-Gen Tech</h1>
@@ -308,30 +304,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     
     <script>
-        // Initialize Lenis Smooth Scroll
-        const lenis = new Lenis({
-            duration: 1.2,
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
-            direction: 'vertical',
-            gestureDirection: 'vertical',
-            smooth: true,
-            mouseMultiplier: 1,
-            smoothTouch: false, // keep native touch scrolling for true mobile feel, but Lenis intercepts
-            touchMultiplier: 2,
-            infinite: false,
-        })
-
-        // Synchronize Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update)
-
-        gsap.ticker.add((time)=>{
-          lenis.raf(time * 1000)
-        })
-
-        gsap.ticker.lagSmoothing(0)
-
-        // Register ScrollTrigger
+        // Register ScrollTrigger first
         gsap.registerPlugin(ScrollTrigger);
+
+        // Initialize Lenis Smooth Scroll ONLY on Desktop
+        // Disabling this on mobile drastically reduces touch event lag
+        if (window.innerWidth > 768) {
+            const lenis = new Lenis({
+                duration: 1.2,
+                easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // smooth exponential easing
+                direction: 'vertical',
+                gestureDirection: 'vertical',
+                smooth: true,
+                mouseMultiplier: 1,
+                smoothTouch: false,
+                touchMultiplier: 2,
+                infinite: false,
+            });
+
+            // Synchronize Lenis with GSAP ScrollTrigger
+            lenis.on('scroll', ScrollTrigger.update);
+
+            gsap.ticker.add((time)=>{
+              lenis.raf(time * 1000);
+            });
+
+            gsap.ticker.lagSmoothing(0);
+        }
 
         // Background Audio Autoplay & Control Logic
         const bgAudio = document.getElementById("bg-audio");
@@ -422,86 +421,8 @@
             });
         }
         
-        // Canvas Image Sequence Logic
-        const canvas = document.getElementById("hero-canvas");
-        const context = canvas.getContext("2d");
-        const frameCount = 241;
-        const currentFrame = index => `public1/image/ezgif-frame-${(index + 1).toString().padStart(3, '0')}.jpg`;
-        const images = [];
-        const canvasObj = { frame: 0 };
-
-        // Handle canvas resize
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            render();
-        }
-        window.addEventListener('resize', resizeCanvas);
-
-        // Pre-fill images array
-        for (let i = 0; i < frameCount; i++) {
-            images.push(new Image());
-        }
-
-        // Draw image to canvas covering it properly
-        function render() {
-            if(!images[canvasObj.frame]) return;
-            const img = images[canvasObj.frame];
-            if(!img.complete || img.naturalWidth === 0) return;
-            
-            const hRatio = canvas.width / img.width;
-            const vRatio = canvas.height / img.height;
-            const ratio = Math.max(hRatio, vRatio);
-            const centerShift_x = (canvas.width - img.width * ratio) / 2;
-            const centerShift_y = (canvas.height - img.height * ratio) / 2;
-            
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.drawImage(img, 0, 0, img.width, img.height,
-                              centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
-        }
-
-        // Load first image immediately to initialize canvas
-        images[0].src = currentFrame(0);
-        images[0].onload = () => {
-            resizeCanvas();
-            // Initial title entrance
-            gsap.fromTo("#canvas-hero-title", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" });
-            // Start sequential batch loading for the rest to prevent mobile connection limit crashes
-            preloadImagesSequentially(1, 4); 
-        };
-        images[0].onerror = () => {
-            preloadImagesSequentially(1, 4);
-        };
-
-        function preloadImagesSequentially(startIndex, batchSize) {
-            if (startIndex >= frameCount) return;
-            let loadedInBatch = 0;
-            let currentBatchSize = Math.min(batchSize, frameCount - startIndex);
-            
-            for (let i = startIndex; i < startIndex + currentBatchSize; i++) {
-                images[i].src = currentFrame(i);
-                images[i].onload = images[i].onerror = () => {
-                    loadedInBatch++;
-                    if (loadedInBatch === currentBatchSize) {
-                        preloadImagesSequentially(startIndex + batchSize, batchSize);
-                    }
-                };
-            }
-        }
-
-        // ScrollTrigger for Canvas Sequence
-        gsap.to(canvasObj, {
-            frame: frameCount - 1,
-            snap: "frame",
-            ease: "none",
-            scrollTrigger: {
-                trigger: "#hero-sequence-section",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: 1 // Softened scrub for mobile frame decoding
-            },
-            onUpdate: render
-        });
+        // Initial title entrance
+        gsap.fromTo("#canvas-hero-title", { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" });
 
         // Overlay Text Animations
         const tl = gsap.timeline({
@@ -567,7 +488,116 @@
         menuBtn.addEventListener("click", openSidebar);
         closeBtn.addEventListener("click", closeSidebar);
         overlay.addEventListener("click", closeSidebar);
-
     </script>
+
+    <!-- PRODUCT AI CHAT WIDGET -->
+    <div class="ai-chat-btn" id="ai-chat-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <div class="ai-chat-window" id="ai-chat-window">
+        <div class="ai-chat-header">
+            <div class="ai-chat-header-title">
+                <div class="online-dot"></div>
+                Neo AI Assistant
+            </div>
+            <button class="ai-chat-close-btn" id="ai-chat-close">&times;</button>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="chat-bubble ai">Hello! I'm Neo, your virtual assistant. How can I help you with our Neon Flexible LED Strip Lights today?</div>
+            <div class="typing-indicator" id="ai-typing">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" class="ai-chat-input" id="ai-chat-input" placeholder="Ask about price, colors, length...">
+            <button class="ai-chat-send-btn" id="ai-chat-send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // AI Chat Logic
+        const chatToggle = document.getElementById("ai-chat-toggle");
+        const chatWindow = document.getElementById("ai-chat-window");
+        const chatClose = document.getElementById("ai-chat-close");
+        const chatInput = document.getElementById("ai-chat-input");
+        const chatSend = document.getElementById("ai-chat-send");
+        const chatMessages = document.getElementById("ai-chat-messages");
+        const typingIndicator = document.getElementById("ai-typing");
+
+        function toggleChat() {
+            chatWindow.classList.toggle("active");
+            if (chatWindow.classList.contains("active")) {
+                setTimeout(() => chatInput.focus(), 100);
+            }
+        }
+
+        chatToggle.addEventListener("click", toggleChat);
+        chatClose.addEventListener("click", toggleChat);
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendMessage(text, sender) {
+            const bubble = document.createElement("div");
+            bubble.classList.add("chat-bubble", sender);
+            bubble.textContent = text;
+            chatMessages.insertBefore(bubble, typingIndicator);
+            scrollToBottom();
+        }
+
+        function handleSend() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            appendMessage(text, "user");
+            chatInput.value = "";
+            
+            // Show typing indicator
+            typingIndicator.style.display = "flex";
+            scrollToBottom();
+
+            // Simulate AI delay
+            setTimeout(() => {
+                typingIndicator.style.display = "none";
+                let response = generateAIResponse(text.toLowerCase());
+                appendMessage(response, "ai");
+            }, 1000 + Math.random() * 1000); // 1-2 second delay
+        }
+
+        chatSend.addEventListener("click", handleSend);
+        chatInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") handleSend();
+        });
+
+        function generateAIResponse(query) {
+            if (query.includes("price") || query.includes("cost") || query.includes("much")) {
+                return "Our 5-meter Neon LED Strip Lights are ₹599.00. The 3 LED Light Module pack (20 pcs) is ₹399.00.";
+            } else if (query.includes("color") || query.includes("colour")) {
+                return "We offer Warm White, Blue, Red, Green, White, and Multi-color options!";
+            } else if (query.includes("length") || query.includes("long") || query.includes("meter")) {
+                return "The Neon flexible strip lights come in standard 5-meter rolls.";
+            } else if (query.includes("waterproof") || query.includes("water") || query.includes("outdoor")) {
+                return "Yes! Our Neon LED strip lights are IP67 waterproof, making them perfect for both indoor and outdoor use.";
+            } else if (query.includes("warranty") || query.includes("guarantee")) {
+                return "We offer a standard 1-year warranty on all our LED strip lights against manufacturing defects.";
+            } else if (query.includes("shipping") || query.includes("delivery")) {
+                return "We offer fast shipping across India. Delivery usually takes 3-5 business days.";
+            } else if (query.includes("hello") || query.includes("hi") || query.includes("hey")) {
+                return "Hello! How can I assist you with your lighting project today?";
+            } else {
+                return "That's a great question! For detailed technical specs or custom bulk orders, please contact our support team at neobrightspkd@gmail.com or call +91 62350 49267.";
+            }
+        }
+    </script>
+
 </body>
 </html>

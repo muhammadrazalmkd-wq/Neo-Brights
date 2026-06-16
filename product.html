@@ -537,11 +537,7 @@
         </div>
 
         <div class="top-bar-right">
-            <a href="tel:+916235049267" class="social-btn" title="Call Us">
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
-                </svg>
-            </a>
+
         </div>
     </div>
 
@@ -631,7 +627,7 @@
                     <div class="form-group">
                         <label>Product Photo</label>
                         <div class="file-upload-wrapper" id="file-upload-wrapper">
-                            <input type="file" id="product-photo" accept="image/*" class="file-input">
+                            <input type="file" id="product-photo" accept="image/*" class="file-input" multiple>
                             <div class="file-upload-content">
                                 <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32" style="margin-bottom: 10px; opacity: 0.7;">
                                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
@@ -639,6 +635,7 @@
                                 <span id="file-name">Drag & Drop or Click to Upload</span>
                             </div>
                         </div>
+                        <div id="image-preview-container" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;"></div>
                     </div>
                     <button type="submit" class="btn-submit-review">Submit Review</button>
                 </form>
@@ -1039,10 +1036,32 @@
             const fileWrapper = document.getElementById('file-upload-wrapper');
 
             fileInput.addEventListener('change', function(e) {
+                const previewContainer = document.getElementById('image-preview-container');
+                if (previewContainer) previewContainer.innerHTML = '';
+                
                 if (this.files && this.files.length > 0) {
-                    fileNameDisplay.textContent = this.files[0].name;
+                    fileNameDisplay.textContent = `${this.files.length} photo(s) selected`;
                     fileWrapper.style.borderColor = "var(--border-color)";
                     fileWrapper.style.background = "rgba(255, 115, 115, 0.1)";
+                    
+                    if (previewContainer) {
+                        Array.from(this.files).forEach(file => {
+                            if (file.type.startsWith('image/')) {
+                                const reader = new FileReader();
+                                reader.onload = function(evt) {
+                                    const img = document.createElement('img');
+                                    img.src = evt.target.result;
+                                    img.style.width = '80px';
+                                    img.style.height = '80px';
+                                    img.style.objectFit = 'cover';
+                                    img.style.borderRadius = '8px';
+                                    img.style.border = '2px solid rgba(255,255,255,0.2)';
+                                    previewContainer.appendChild(img);
+                                }
+                                reader.readAsDataURL(file);
+                            }
+                        });
+                    }
                 } else {
                     fileNameDisplay.textContent = "Drag & Drop or Click to Upload";
                     fileWrapper.style.borderColor = "rgba(255, 255, 255, 0.2)";
@@ -1061,12 +1080,124 @@
                 setTimeout(() => {
                     alert("Thank you for your rating & review!");
                     reviewForm.reset();
+                    const previewContainer = document.getElementById('image-preview-container');
+                    if (previewContainer) previewContainer.innerHTML = '';
                     fileNameDisplay.textContent = "Drag & Drop or Click to Upload";
                     btn.textContent = originalText;
                     btn.style.opacity = 1;
                 }, 1000);
             });
         });
+    </script>
+    <!-- PRODUCT AI CHAT WIDGET -->
+    <div class="ai-chat-btn" id="ai-chat-toggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+    </div>
+
+    <div class="ai-chat-window" id="ai-chat-window">
+        <div class="ai-chat-header">
+            <div class="ai-chat-header-title">
+                <div class="online-dot"></div>
+                Neo AI Assistant
+            </div>
+            <button class="ai-chat-close-btn" id="ai-chat-close">&times;</button>
+        </div>
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="chat-bubble ai">Hello! I'm Neo, your virtual assistant. How can I help you with our Neon Flexible LED Strip Lights today?</div>
+            <div class="typing-indicator" id="ai-typing">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="ai-chat-input-area">
+            <input type="text" class="ai-chat-input" id="ai-chat-input" placeholder="Ask about price, colors, length...">
+            <button class="ai-chat-send-btn" id="ai-chat-send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // AI Chat Logic
+        const chatToggle = document.getElementById("ai-chat-toggle");
+        const chatWindow = document.getElementById("ai-chat-window");
+        const chatClose = document.getElementById("ai-chat-close");
+        const chatInput = document.getElementById("ai-chat-input");
+        const chatSend = document.getElementById("ai-chat-send");
+        const chatMessages = document.getElementById("ai-chat-messages");
+        const typingIndicator = document.getElementById("ai-typing");
+
+        if(chatToggle) {
+            function toggleChat() {
+                chatWindow.classList.toggle("active");
+                if (chatWindow.classList.contains("active")) {
+                    setTimeout(() => chatInput.focus(), 100);
+                }
+            }
+
+            chatToggle.addEventListener("click", toggleChat);
+            chatClose.addEventListener("click", toggleChat);
+
+            function scrollToBottom() {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            function appendMessage(text, sender) {
+                const bubble = document.createElement("div");
+                bubble.classList.add("chat-bubble", sender);
+                bubble.textContent = text;
+                chatMessages.insertBefore(bubble, typingIndicator);
+                scrollToBottom();
+            }
+
+            function handleSend() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                appendMessage(text, "user");
+                chatInput.value = "";
+                
+                // Show typing indicator
+                typingIndicator.style.display = "flex";
+                scrollToBottom();
+
+                // Simulate AI delay
+                setTimeout(() => {
+                    typingIndicator.style.display = "none";
+                    let response = generateAIResponse(text.toLowerCase());
+                    appendMessage(response, "ai");
+                }, 1000 + Math.random() * 1000); // 1-2 second delay
+            }
+
+            chatSend.addEventListener("click", handleSend);
+            chatInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") handleSend();
+            });
+
+            function generateAIResponse(query) {
+                if (query.includes("price") || query.includes("cost") || query.includes("much")) {
+                    return "Our 5-meter Neon LED Strip Lights are ₹599.00. The 3 LED Light Module pack (20 pcs) is ₹399.00.";
+                } else if (query.includes("color") || query.includes("colour")) {
+                    return "We offer Warm White, Blue, Red, Green, White, and Multi-color options!";
+                } else if (query.includes("length") || query.includes("long") || query.includes("meter")) {
+                    return "The Neon flexible strip lights come in standard 5-meter rolls.";
+                } else if (query.includes("waterproof") || query.includes("water") || query.includes("outdoor")) {
+                    return "Yes! Our Neon LED strip lights are IP67 waterproof, making them perfect for both indoor and outdoor use.";
+                } else if (query.includes("warranty") || query.includes("guarantee")) {
+                    return "We offer a standard 1-year warranty on all our LED strip lights against manufacturing defects.";
+                } else if (query.includes("shipping") || query.includes("delivery")) {
+                    return "We offer fast shipping across India. Delivery usually takes 3-5 business days.";
+                } else if (query.includes("hello") || query.includes("hi") || query.includes("hey")) {
+                    return "Hello! How can I assist you with your lighting project today?";
+                } else {
+                    return "That's a great question! For detailed technical specs or custom bulk orders, please contact our support team at neobrightspkd@gmail.com or call +91 62350 49267.";
+                }
+            }
+        }
     </script>
 </body>
 </html>
