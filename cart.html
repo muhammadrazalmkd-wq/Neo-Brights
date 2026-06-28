@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart - Neo brights</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="public5/image/1.overview_image_53293314_1076212.png" type="image/png">
     <style>
         body {
             background-color: var(--deep-black);
@@ -445,9 +446,11 @@
 
             cart.forEach((item, index) => {
                 const itemDiv = document.createElement("div");
-                itemDiv.className = "cart-item fade-in-section";
+                itemDiv.className = "cart-item";
+                itemDiv.style.opacity = '1';
+                itemDiv.style.transform = 'translateY(0)';
                 itemDiv.innerHTML = `
-                    <img src="${item.image}" alt="${item.title}" class="cart-item-img">
+                    <img src="${item.image}" alt="${item.title}" class="cart-item-img" loading="eager" decoding="async">
                     <div class="cart-item-info">
                         <h2 class="cart-item-title">${item.title}</h2>
                         <div class="cart-item-price">Qty: ${item.quantity || 1}</div>
@@ -456,15 +459,6 @@
                 `;
                 cartItemsContainer.appendChild(itemDiv);
             });
-
-            // Trigger animation for newly rendered items
-            setTimeout(() => {
-                document.querySelectorAll('.fade-in-section').forEach(el => {
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateY(0)';
-                    el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                });
-            }, 50);
         }
 
         function removeItem(index) {

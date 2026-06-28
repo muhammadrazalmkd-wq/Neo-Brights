@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="public5/image/1.overview_image_53293314_1076212.png" type="image/png">
     <style>
         body {
             background-color: var(--bg-color);
@@ -547,7 +548,7 @@
             <div class="details-visual" id="visual-container">
                 <div class="img-wrapper">
                     <button class="nav-arrow left-arrow" id="prev-btn">&#10094;</button>
-                    <img src="public5/image/1.overview_image_53293314_1076212.png" alt="Product Image" id="product-img" class="details-img">
+                    <img src="public5/image/1.overview_image_53293314_1076212.png" alt="Product Image" id="product-img" class="details-img" decoding="async">
                     <button class="nav-arrow right-arrow" id="next-btn">&#10095;</button>
                 </div>
             </div>
@@ -591,7 +592,7 @@
 
     <!-- PRODUCT VIDEO SECTION -->
     <div class="product-video-container fade-in-section">
-        <video class="product-video" autoplay loop muted playsinline>
+        <video class="product-video lazy-video" controls loop muted playsinline preload="metadata">
             <source src="public4/mp4/YouCut_20260602_085054679.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -825,6 +826,12 @@
                     allImages.push(...product.extraImages);
                 }
 
+                // Preload gallery images into browser cache to eliminate slowness and lag when switching
+                allImages.forEach(src => {
+                    const img = new Image();
+                    img.src = src;
+                });
+
                 let currentImageIndex = 0;
 
                 const changeImage = (newIndex) => {
@@ -920,6 +927,8 @@
                     thumb.src = imgSrc;
                     thumb.alt = `${product.title} - View ${index + 1}`;
                     thumb.className = 'thumb-img' + (index === 0 ? ' active' : '');
+                    thumb.loading = 'eager';
+                    thumb.decoding = 'async';
                     thumb.addEventListener('click', () => {
                         changeImage(index);
                     });
@@ -962,14 +971,14 @@
                 document.getElementById("product-specs").innerHTML = '';
             }
 
-            // Simple Fade In animation
+            // Fast & Snappy Fade In animation
             const fadeElements = document.querySelectorAll('.fade-in-section');
             fadeElements.forEach(el => {
                 setTimeout(() => {
                     el.style.opacity = '1';
                     el.style.transform = 'translateY(0)';
-                    el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-                }, 100);
+                    el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                }, 10);
             });
 
             // E-Commerce Dashboard Logic
@@ -1026,7 +1035,7 @@
                     
                     setTimeout(() => {
                         window.location.href = "cart.html";
-                    }, 800);
+                    }, 150);
                 });
             }
 
@@ -1165,12 +1174,12 @@
                 typingIndicator.style.display = "flex";
                 scrollToBottom();
 
-                // Simulate AI delay
+                // Fast AI response
                 setTimeout(() => {
                     typingIndicator.style.display = "none";
                     let response = generateAIResponse(text.toLowerCase());
                     appendMessage(response, "ai");
-                }, 1000 + Math.random() * 1000); // 1-2 second delay
+                }, 250); // 250ms lightning response
             }
 
             chatSend.addEventListener("click", handleSend);
@@ -1194,10 +1203,30 @@
                 } else if (query.includes("hello") || query.includes("hi") || query.includes("hey")) {
                     return "Hello! How can I assist you with your lighting project today?";
                 } else {
-                    return "That's a great question! For detailed technical specs or custom bulk orders, please contact our support team at neobrightspkd@gmail.com or call +91 62350 49267.";
+                    return "That's a great question! For detailed technical specs or custom bulk orders, please contact our support team at muhammadrazalmkd@gmail.com or call +91 62350 49267.";
                 }
             }
         }
+
+        // Lazy load & observe videos to prevent performance degradation and slowness
+        document.addEventListener("DOMContentLoaded", () => {
+            const lazyVideos = document.querySelectorAll("video.lazy-video");
+            if ("IntersectionObserver" in window) {
+                const videoObserver = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        const video = entry.target;
+                        if (entry.isIntersecting) {
+                            video.play().catch(e => console.log("Video auto-resume waiting for user interaction:", e));
+                        } else {
+                            video.pause();
+                        }
+                    });
+                }, { threshold: 0.15 });
+                lazyVideos.forEach((video) => videoObserver.observe(video));
+            } else {
+                lazyVideos.forEach((video) => video.play().catch(e => console.log(e)));
+            }
+        });
     </script>
 </body>
 </html>
